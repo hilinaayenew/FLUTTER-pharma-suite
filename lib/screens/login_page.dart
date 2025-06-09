@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dashboard_page.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -21,83 +23,96 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your username';
-                  }
-                  return null;
-                },
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 400),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  DropdownButtonFormField<String>(
+                    value: _selectedRole,
+                    decoration: const InputDecoration(
+                      labelText: 'Role',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: _roles.map((String role) {
+                      return DropdownMenuItem(
+                        value: role,
+                        child: Text(role),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _selectedRole = newValue;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 24.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // TODO: Add authentication logic here
+                        // Pass the selected role to DashboardPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DashboardPage(
+                              userRole: _selectedRole,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text('Login'),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/signup');
+                    },
+                    child: const Text('Don\'t have an account? Sign Up'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              DropdownButtonFormField<String>(
-                value: _selectedRole,
-                decoration: const InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(),
-                ),
-                items: _roles.map((String role) {
-                  return DropdownMenuItem(
-                    value: role,
-                    child: Text(role),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedRole = newValue;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 24.0),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // TODO: Implement login logic
-                    Navigator.pushReplacementNamed(context, '/dashboard');
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text('Login'),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/signup');
-                },
-                child: const Text('Don\'t have an account? Sign Up'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -12,7 +12,7 @@ class AppTheme {
     primaryColor: primaryColor,
     scaffoldBackgroundColor: backgroundColor,
     appBarTheme: const AppBarTheme(
-      backgroundColor: primaryColor,
+      backgroundColor: Color.fromARGB(255, 234, 237, 244),
       elevation: 0,
     ),
     cardTheme: const CardTheme(

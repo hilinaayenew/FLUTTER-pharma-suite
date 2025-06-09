@@ -6,13 +6,21 @@ class EmployeesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Employees'),
+            appBar: AppBar(
+        title: TextField(
+          decoration: InputDecoration(
+            hintText: 'Search for anything here...',
+            hintStyle: TextStyle(color: Colors.white70),
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.search, color: Colors.white70),
+          ),
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
-              // Implement search functionality
+              // Implement filter functionality
             },
           ),
           IconButton(

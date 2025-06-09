@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  final String userRole; // Add this line to accept user role
+
+  const DashboardPage({Key? key, required this.userRole}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,82 +31,159 @@ class DashboardPage extends StatelessWidget {
                 color: Color(0xFF1E2F4D),
               ),
               accountName: const Text(
-                'Abel',
+                'User Name',
                 style: TextStyle(color: Colors.white),
               ),
-              accountEmail: const Text(
-                'ADMIN',
-                style: TextStyle(color: Colors.green),
+              accountEmail: Text(
+                userRole.toUpperCase(),
+                style: const TextStyle(color: Colors.green),
               ),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, size: 40, color: Color(0xFF1E2F4D)),
               ),
-              otherAccountsPictures: [
-                IconButton(
-                  icon: const Icon(Icons.more_vert, color: Colors.white),
-                  onPressed: () {
-                    // TODO: Implement account settings menu
-                  },
-                ),
-              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.dashboard, color: Colors.white),
-              title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.medical_services, color: Colors.white),
-              title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/medicines');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.people, color: Colors.white),
-              title: const Text('Suppliers', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/suppliers');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.badge, color: Colors.white),
-              title: const Text('Employees', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/employees');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.receipt, color: Colors.white),
-              title: const Text('Transactions', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/transactions');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.category, color: Colors.white),
-              title: const Text('Categories', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/categories');
-              },
-            ),
-            const Divider(color: Colors.white24),
-            ListTile(
-              leading: const Icon(Icons.settings, color: Colors.white),
-              title: const Text('Settings', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/settings');
-              },
-            ),
+            if (userRole == 'Pharmacist') ...[
+              ListTile(
+                leading: const Icon(Icons.dashboard, color: Colors.white),
+                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.medical_services, color: Colors.white),
+                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/medicines');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.category, color: Colors.white),
+                title: const Text('Categories', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/categories');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings, color: Colors.white),
+                title: const Text('Settings', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/settings');
+                },
+              ),
+            ],
+            if (userRole == 'Cashier') ...[
+              ListTile(
+                leading: const Icon(Icons.dashboard, color: Colors.white),
+                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.medical_services, color: Colors.white),
+                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/medicines');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.category, color: Colors.white),
+                title: const Text('Categories', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/categories');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.receipt, color: Colors.white),
+                title: const Text('Transactions', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/transactions');
+                },
+              ),
+   
+              ListTile(
+                leading: const Icon(Icons.people, color: Colors.white),
+                title: const Text('Suppliers', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/suppliers');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings, color: Colors.white),
+                title: const Text('Settings', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/settings');
+                },
+              ),
+            ],
+          if (userRole == 'Admin') ...[
+                          ListTile(
+                leading: const Icon(Icons.dashboard, color: Colors.white),
+                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.medical_services, color: Colors.white),
+                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/medicines');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.category, color: Colors.white),
+                title: const Text('Categories', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/categories');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.receipt, color: Colors.white),
+                title: const Text('Transactions', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/transactions');
+                },
+              ),
+
+              ListTile(
+                leading: const Icon(Icons.people, color: Colors.white),
+                title: const Text('Suppliers', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/suppliers');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.people,color: Colors.white),
+                title: const Text('Employees', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/employees');
+                },
+              ), 
+              ListTile(
+                leading: const Icon(Icons.settings, color: Colors.white),
+                title: const Text('Settings', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/settings');
+                },
+              ),
+          ]
           ],
         ),
       ),

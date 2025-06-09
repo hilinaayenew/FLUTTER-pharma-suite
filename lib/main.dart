@@ -7,6 +7,7 @@ import 'screens/dashboard_page.dart';
 import 'screens/medicine_list_page.dart';
 import 'screens/suppliers_page.dart';
 import 'screens/employees_page.dart';
+import 'screens/settings_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,15 +21,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pharmacy Management',
       theme: AppTheme.darkTheme,
+      debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/verification': (context) => const VerificationPage(),
-        '/dashboard': (context) => const DashboardPage(),
+       
         '/medicines': (context) => const MedicineListPage(),
         '/suppliers': (context) => const SuppliersPage(),
         '/employees': (context) => const EmployeesPage(),
+        '/settings': (context) => const SettingsPage(),
       },
     );
   }
