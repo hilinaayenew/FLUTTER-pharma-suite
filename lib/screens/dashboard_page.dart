@@ -23,11 +23,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<Map<String, dynamic>> _initializeDashboardData() async {
     try {
-      // Initialize DAOs
-      final medicineDao = MedicineDAO.instance;
-      final supplierDao = SupplierDAO.instance;
-      final employeeDao = EmployeeDAO.instance;
-
       // Fetch all statistics concurrently
       final stats = await Future.wait([
         _getMedicineStats(),
