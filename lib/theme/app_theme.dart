@@ -7,7 +7,7 @@ class AppTheme {
   static const Color cardColor = Color(0xFF252B42);
   static const Color textColor = Colors.white;
   static const Color secondaryTextColor = Colors.white70;
-  
+
   static ThemeData darkTheme = ThemeData(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: backgroundColor,
@@ -15,7 +15,7 @@ class AppTheme {
       backgroundColor: Color.fromARGB(255, 234, 237, 244),
       elevation: 0,
     ),
-    cardTheme: const CardTheme(
+    cardTheme: const CardThemeData(
       color: cardColor,
       elevation: 2,
     ),
