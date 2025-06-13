@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pharam_suite_v5/models/User.dart';
 import 'dashboard_page.dart';
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,16 +13,13 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'Pharmacist';
 
-  final List<String> _roles = ['Pharmacist', 'Admin', 'Cashier'];
+  // final List<String> _roles = ['pharmacist', 'admin', 'cashier'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -61,54 +58,36 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16.0),
-                  DropdownButtonFormField<String>(
-                    value: _selectedRole,
-                    decoration: const InputDecoration(
-                      labelText: 'Role',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _roles.map((String role) {
-                      return DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _selectedRole = newValue;
-                        });
-                      }
-                    },
-                  ),
                   const SizedBox(height: 24.0),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // TODO: Add authentication logic here
-                        // Pass the selected role to DashboardPage
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DashboardPage(
-                              userRole: _selectedRole,
-                            ),
-                          ),
+                        final response = await UserDAO.instance.authenticate(
+                          _usernameController.text,
+                          _passwordController.text,
                         );
+
+                        if (response != null) {
+                          UserDAO.instance.saveUserToPrefs(response);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DashboardPage(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Invalid username or password'),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text('Login'),
                     ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/signup');
-                    },
-                    child: const Text('Don\'t have an account? Sign Up'),
                   ),
                 ],
               ),
