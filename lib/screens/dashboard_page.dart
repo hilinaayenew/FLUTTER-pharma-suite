@@ -1,9 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:pharam_suite_v5/models/Employee.dart';
+import 'package:pharam_suite_v5/models/Medicine.dart';
+import 'package:pharam_suite_v5/models/Supplier.dart';
+import 'package:pharam_suite_v5/models/User.dart';
+import 'package:pharam_suite_v5/widgets/drawer.dart';
 
-class DashboardPage extends StatelessWidget {
-  final String userRole; // Add this line to accept user role
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({Key? key}) : super(key: key);
 
-  const DashboardPage({Key? key, required this.userRole}) : super(key: key);
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  late Future<Map<String, dynamic>> _dashboardData;
+
+  @override
+  void initState() {
+    super.initState();
+    _dashboardData = _initializeDashboardData();
+  }
+
+  Future<Map<String, dynamic>> _initializeDashboardData() async {
+    try {
+      // Initialize DAOs
+      final medicineDao = MedicineDAO.instance;
+      final supplierDao = SupplierDAO.instance;
+      final employeeDao = EmployeeDAO.instance;
+
+      // Fetch all statistics concurrently
+      final stats = await Future.wait([
+        _getMedicineStats(),
+        _getSupplierCount(),
+        _getEmployeeCount(),
+        _getStockStats(),
+      ]);
+
+      return {
+        'medicineStats': stats[0],
+        'supplierCount': stats[1],
+        'employeeCount': stats[2],
+        'stockStats': stats[3],
+      };
+    } catch (e) {
+      throw Exception('Failed to initialize dashboard data: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> _getMedicineStats() async {
+    final medicines = await MedicineDAO.instance.getAllMedicines();
+    final today = DateTime.now();
+
+    final expiredMedicines =
+        medicines
+            .where(
+              (m) =>
+                  m.expiryDate != null &&
+                  DateTime.parse(m.expiryDate!).isBefore(today),
+            )
+            .length;
+
+    return {
+      'totalMedicines': medicines.length,
+      'expiredMedicines': expiredMedicines,
+    };
+  }
+
+  Future<int> _getSupplierCount() async {
+    return await SupplierDAO.instance.getAllSuppliers().then(
+      (suppliers) => suppliers.length,
+    );
+  }
+
+  Future<int> _getEmployeeCount() async {
+    return await EmployeeDAO.instance.getAllEmployees().then(
+      (employees) => employees.length,
+    );
+  }
+
+  Future<Map<String, dynamic>> _getStockStats() async {
+    final medicines = await MedicineDAO.instance.getAllMedicines();
+    final totalStock = medicines.fold(0, (sum, m) => sum + m.quantity);
+
+    return {'totalStock': totalStock};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,262 +95,89 @@ class DashboardPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // TODO: Implement logout logic
+              UserDAO.instance.clearUserPrefs();
               Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
       ),
-      drawer: Drawer(
-        backgroundColor: const Color(0xFF1E2F4D),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E2F4D),
-              ),
-              accountName: const Text(
-                'User Name',
-                style: TextStyle(color: Colors.white),
-              ),
-              accountEmail: Text(
-                userRole.toUpperCase(),
-                style: const TextStyle(color: Colors.green),
-              ),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Color(0xFF1E2F4D)),
-              ),
-            ),
-            if (userRole == 'Pharmacist') ...[
-              ListTile(
-                leading: const Icon(Icons.dashboard, color: Colors.white),
-                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.medical_services, color: Colors.white),
-                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/medicines');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.category, color: Colors.white),
-                title: const Text('Categories', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/categories');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings, color: Colors.white),
-                title: const Text('Settings', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
-            if (userRole == 'Cashier') ...[
-              ListTile(
-                leading: const Icon(Icons.dashboard, color: Colors.white),
-                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.medical_services, color: Colors.white),
-                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/medicines');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.category, color: Colors.white),
-                title: const Text('Categories', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/categories');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.receipt, color: Colors.white),
-                title: const Text('Transactions', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/transactions');
-                },
-              ),
-   
-              ListTile(
-                leading: const Icon(Icons.people, color: Colors.white),
-                title: const Text('Suppliers', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/suppliers');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings, color: Colors.white),
-                title: const Text('Settings', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-            ],
-          if (userRole == 'Admin') ...[
-                          ListTile(
-                leading: const Icon(Icons.dashboard, color: Colors.white),
-                title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.medical_services, color: Colors.white),
-                title: const Text('Medicine List', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/medicines');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.category, color: Colors.white),
-                title: const Text('Categories', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/categories');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.receipt, color: Colors.white),
-                title: const Text('Transactions', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/transactions');
-                },
-              ),
+      drawer: AppDrawer(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _dashboardData,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-              ListTile(
-                leading: const Icon(Icons.people, color: Colors.white),
-                title: const Text('Suppliers', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/suppliers');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.people,color: Colors.white),
-                title: const Text('Employees', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/employees');
-                },
-              ), 
-              ListTile(
-                leading: const Icon(Icons.settings, color: Colors.white),
-                title: const Text('Settings', style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
-          ]
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Dashboard',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'A quick data overview of the inventory.',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4, // Fixed for full size
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: Text('No data available'));
+          }
+
+          final data = snapshot.data!;
+          final medicineStats = data['medicineStats'] as Map<String, dynamic>;
+          final supplierCount = data['supplierCount'] as int;
+          final employeeCount = data['employeeCount'] as int;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStatCard(
-                  '8904',
-                  'Medicine sale today',
-                  Icons.medical_services_outlined,
-                  Colors.blue,
+                const Text(
+                  'Dashboard',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                _buildStatCard(
-                  '56',
-                  'Transactions today',
-                  Icons.receipt_outlined,
-                  Colors.blue,
+                const Text(
+                  'A quick data overview of the inventory.',
+                  style: TextStyle(color: Colors.grey),
                 ),
-                _buildStatCard(
-                  '298',
-                  'Medicines Available',
-                  Icons.medical_services_outlined,
-                  Colors.blue,
+                const SizedBox(height: 24),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                  children: [
+                    _buildStatCard(
+                      medicineStats['totalMedicines'].toString(),
+                      'Medicines Available',
+                      Icons.medical_services_outlined,
+                      Colors.blue,
+                    ),
+                    _buildStatCard(
+                      medicineStats['expiredMedicines'].toString(),
+                      'Expired Medicine',
+                      Icons.warning_outlined,
+                      Colors.red,
+                      isWarning: true,
+                    ),
+                  ],
                 ),
-                _buildStatCard(
-                  '01',
-                  'Expired Medicine',
-                  Icons.warning_outlined,
-                  Colors.red,
-                  isWarning: true,
-                ),
+                const SizedBox(height: 24),
+                _buildInfoCard('My Pharmacy', [
+                  InfoItem('Total no of Suppliers', supplierCount.toString()),
+                  InfoItem('Total no of Employees', employeeCount.toString()),
+                ]),
               ],
             ),
-            const SizedBox(height: 24),
-            _buildInfoCard(
-              'My Pharmacy',
-              [
-                InfoItem('Total no of Suppliers', '67'),
-                InfoItem('Total no of Customers', '567'),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoCard(
-              'Quick Report',
-              [
-                InfoItem('Total Qty of\nMedicines Sold', '70,856'),
-                InfoItem('Qty of Medicines\nin stock', '5,288'),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title, bool isSelected) {
-    return ListTile(
-      leading: Icon(icon, color: isSelected ? Colors.white : Colors.white70),
-      title: Text(
-        title,
-        style: TextStyle(color: isSelected ? Colors.white : Colors.white70),
-      ),
-      selected: isSelected,
-      selectedTileColor: Colors.white.withOpacity(0.1),
-      onTap: () {},
-    );
-  }
-
-  Widget _buildStatCard(String value, String title, IconData icon, Color color, {bool isWarning = false}) {
+  Widget _buildStatCard(
+    String value,
+    String title,
+    IconData icon,
+    Color color, {
+    bool isWarning = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -292,10 +199,7 @@ class DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-          ),
+          Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
         ],
       ),
     );
@@ -317,27 +221,33 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
-            children: items
-                .map((item) => Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.value,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+            children:
+                items
+                    .map(
+                      (item) => Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.value,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.label,
-                            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              item.label,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ))
-                .toList(),
+                    )
+                    .toList(),
           ),
         ],
       ),
