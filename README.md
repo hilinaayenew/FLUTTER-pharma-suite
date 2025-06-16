@@ -2,6 +2,14 @@
 
 A comprehensive pharmacy management system built with Flutter, designed to streamline and modernize pharmacy operations.
 
+## Project Team
+
+- Hilina Ayenew /UGR/6619/14
+- Mahder Mulugeta /UGR/2193/14
+- Meron Mathewos / UGR/0632/14
+- Mieraf Yinebebal / UGR/6205/14
+- Nathnael Getachew / UGR/0841/14
+
 ## Features
 
 - **Dashboard**: Real-time inventory overview, sales statistics, and quick reports
